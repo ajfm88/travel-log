@@ -1,4 +1,3 @@
-// .vscode/settings.json
 {
   // Disable the default formatter, use eslint instead
   "prettier.enable": false,
@@ -10,18 +9,22 @@
     "source.organizeImports": "never"
   },
 
-  // Stylistic rules
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+
+  // Silent the stylistic rules in you IDE, but still auto fix them
   "eslint.rules.customizations": [
-    { "rule": "style/*", "fixable": true },
-    { "rule": "format/*", "fixable": true },
-    { "rule": "*-indent", "fixable": true },
-    { "rule": "*-spacing", "fixable": true },
-    { "rule": "*-spaces", "fixable": true },
-    { "rule": "*-order", "fixable": true },
-    { "rule": "*-dangle", "fixable": true },
-    { "rule": "*-newline", "fixable": true },
-    { "rule": "*quotes", "fixable": true },
-    { "rule": "*semi", "fixable": true }
+    { "rule": "style/*", "severity": "off", "fixable": true },
+    { "rule": "format/*", "severity": "off", "fixable": true },
+    { "rule": "*-indent", "severity": "off", "fixable": true },
+    { "rule": "*-spacing", "severity": "off", "fixable": true },
+    { "rule": "*-spaces", "severity": "off", "fixable": true },
+    { "rule": "*-order", "severity": "off", "fixable": true },
+    { "rule": "*-dangle", "severity": "off", "fixable": true },
+    { "rule": "*-newline", "severity": "off", "fixable": true },
+    { "rule": "*quotes", "severity": "off", "fixable": true },
+    { "rule": "*semi", "severity": "off", "fixable": true }
   ],
 
   // Enable eslint for all supported languages
