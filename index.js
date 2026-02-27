@@ -1,53 +1,58 @@
-// Problem 1 — Warm Up
-// Fetch all users from https://jsonplaceholder.typicode.com/users
-// and print only their name and email, sorted alphabetically by name.
+// Problem 2 — Filtering & Counting
+// Fetch all todos from https://jsonplaceholder.typicode.com/todos and print a
+// summary per user showing how many todos they have total and how many are completed.
+// Output should look like:
+// User 1: 20 total, 11 completed
+// User 2: 20 total, 8 completed
+// ...
 
 const axios = require("axios");
 
 async function main() {
   try {
-    // make a GET request to the API and destructure the data property
-    // axios always wraps the response in { data }, regardless of what the API returns
+    // fetch all todos and destructure data from the axios response
     const { data } = await axios.get(
-      "https://jsonplaceholder.typicode.com/users",
+      "https://jsonplaceholder.typicode.com/todos",
     );
-    // sort by the name property
-    /*data.sort((a, b) => {
-      const nameA = a.name;
-      const nameB = b.name;
-      if (nameA < nameB) {
-      // keep a before b
-        return -1;
+
+    // reduce transforms the array into a single object grouped by userId
+    // acc (accumulator) starts as an empty object {}
+    // each iteration adds to it and returns it for the next iteration
+    const totalToDos = data.reduce((acc, item) => {
+      // if this userId doesn't exist in acc yet, create it
+      // with counters starting at 0
+      if (!acc[item.userId]) {
+        acc[item.userId] = {
+          totalTodos: 0,
+          completed: 0,
+        };
       }
-      if (nameA > nameB) {
-      // put b before a
-        return 1;
+
+      // increment total todos for this user on every iteration
+      acc[item.userId].totalTodos++;
+
+      // only increment completed if the todo's completed property is true
+      if (item.completed) {
+        acc[item.userId].completed++;
       }
-      // equal, dont move them
-      return 0;
-    });*/
 
-    // sort the array of user objects alphabetically by name
-    // localeCompare compares two strings and returns -1, 0, or 1
-    // which is exactly what sort() needs to order the array
-    data.sort((a, b) => a.name.localeCompare(b.name));
+      // must return acc so the next iteration receives the updated object
+      return acc;
+    }, {}); // {} is the initial value of acc
 
-    // map over the sorted array and return a new array
-    // with only the name and email properties from each user object
-    const simplifiedUsers = data.map((user) => ({
-      name: user.name,
-      email: user.email,
-    }));
-
-    // print the final result
-    console.log(simplifiedUsers);
+    // Object.entries() converts the object into an array of [key, value] pairs
+    // so we can loop over it with for...of
+    // key = userId, value = { totalTodos, completed }
+    for (const [key, value] of Object.entries(totalToDos)) {
+      console.log(
+        `User ${key}: Total ToDos: ${value.totalTodos}, Completed: ${value.completed}`,
+      );
+    }
   } catch (err) {
-    // if anything goes wrong (network error, bad response, etc.)
-    // catch it and print the error message
-    console.log("Error: ", err.message);
+    // catch any errors from the request or data manipulation
+    console.error("Error: ", err);
   }
 }
 
-// call the function to actually run it
-// without this line, nothing happens
+// call the function to run it
 main();
