@@ -10,49 +10,29 @@ const axios = require("axios");
 
 async function main() {
   try {
-    // fetch all todos and destructure data from the axios response
     const { data } = await axios.get(
       "https://jsonplaceholder.typicode.com/todos",
     );
 
-    // reduce transforms the array into a single object grouped by userId
-    // acc (accumulator) starts as an empty object {}
-    // each iteration adds to it and returns it for the next iteration
-    const totalToDos = data.reduce((acc, item) => {
-      // if this userId doesn't exist in acc yet, create it
-      // with counters starting at 0
+    const userStats = data.reduce((acc, item) => {
       if (!acc[item.userId]) {
-        acc[item.userId] = {
-          totalTodos: 0,
-          completed: 0,
-        };
+        acc[item.userId] = { totalTodos: 0, completedTodos: 0 };
       }
-
-      // increment total todos for this user on every iteration
       acc[item.userId].totalTodos++;
-
-      // only increment completed if the todo's completed property is true
       if (item.completed) {
-        acc[item.userId].completed++;
+        acc[item.userId].completedTodos++;
       }
-
-      // must return acc so the next iteration receives the updated object
       return acc;
-    }, {}); // {} is the initial value of acc
+    }, {});
 
-    // Object.entries() converts the object into an array of [key, value] pairs
-    // so we can loop over it with for...of
-    // key = userId, value = { totalTodos, completed }
-    for (const [key, value] of Object.entries(totalToDos)) {
+    for (const [key, value] of Object.entries(userStats)) {
       console.log(
-        `User ${key}: Total ToDos: ${value.totalTodos}, Completed: ${value.completed}`,
+        `User ${key}: ${value.totalTodos} total, ${value.completedTodos} completed`,
       );
     }
   } catch (err) {
-    // catch any errors from the request or data manipulation
-    console.error("Error: ", err);
+    console.error("Error is: ", err);
   }
 }
 
-// call the function to run it
 main();
