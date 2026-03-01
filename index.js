@@ -1,40 +1,35 @@
-// Problem 2 — Filtering & Counting (lodash groupBy version)
-// Fetch all todos from https://jsonplaceholder.typicode.com/todos and print a
-// summary per user showing how many todos they have total and how many are completed.
-
+// Problem 3 — Chained Requests
+// Fetch all posts from https://jsonplaceholder.typicode.com/posts,
+// then for the first 5 posts only, fetch their comments from
+// https://jsonplaceholder.typicode.com/comments?postId={id} and print
+// each post's title along with how many comments it has.
 const axios = require("axios");
-const _ = require("lodash");
 
 async function main() {
   try {
-    // fetch all todos and destructure data from the axios response
     const { data } = await axios.get(
-      "https://jsonplaceholder.typicode.com/todos",
+      "https://jsonplaceholder.typicode.com/posts",
     );
 
-    // _.groupBy groups the array into an object of arrays
-    // keyed by the userId property
-    // result looks like: { '1': [{...}, {...}], '2': [{...}, {...}] }
-    const grouped = _.groupBy(data, "userId");
+    const slicedArray = data.slice(0, 5);
 
-    // Object.entries converts the object into [key, value] pairs
-    // key = userId, value = array of todos belonging to that user
-    for (const [userId, todos] of Object.entries(grouped)) {
-      // todos is an array so we can use .length to get the total
-      const totalTodos = todos.length;
+    const commentsFromFirstFive = await Promise.all(
+      slicedArray.map(async (post) => {
+        const { data: comments } = await axios.get(
+          `https://jsonplaceholder.typicode.com/comments?postId=${post.id}`,
+        );
+        return comments;
+      }),
+    );
 
-      // filter returns a new array of only completed todos
-      // then .length gives us the count
-      const completedTodos = todos.filter((todo) => todo.completed).length;
-
+    slicedArray.forEach((post, index) => {
       console.log(
-        `User ${userId}: ${totalTodos} total, ${completedTodos} completed`,
+        `"${post.title}" - ${commentsFromFirstFive[index].length} comments`,
       );
-    }
+    });
   } catch (err) {
     console.error("Error is: ", err);
   }
 }
 
-// call the function to run it
 main();
